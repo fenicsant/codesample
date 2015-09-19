@@ -1,4 +1,3 @@
 QT = core gui
-SOURCES += mainproc.cpp mwind.cpp
-HEADERS += mwind.h \
-    cell_p.h
+SOURCES += mainproc.cpp mwind.cpp cellvalidator.cpp
+HEADERS += mwind.h cellvalidator.h

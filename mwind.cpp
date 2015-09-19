@@ -1,23 +1,27 @@
 #include "mwind.h"
-#include "cell_p.h"
 
 #include <QGridLayout>
 #include <QLabel>
 #include <QKeyEvent>
 
 MWind::MWind(QWidget *parent) :
-  QWidget(parent), cells(9)
+  QWidget(parent), cells(MatrixSize)
 {
   QGridLayout *lay = new QGridLayout();
   lay->setMargin(1);
   lay->setSpacing(1);
-  for(int i=0; i<9; ++i) {
-    int x = i%3;
-    int y = i/3;
-    lay->addWidget(cells[i]=new Cell(this,cells,x,y),y,x);
+  for(int i=0; i<MatrixSize; ++i) {
+    int x = i%SideSize;
+    int y = i/SideSize;
+    lay->addWidget(cells[i]=new Cell(this,cells,x,y),y+y/SubSquare,x+x/SubSquare);
   }
   setStyleSheet("background: black");
   setLayout(lay);
+
+  for(int i=0; i<SubSquare-1; ++i) {
+    lay->setRowMinimumHeight(i*(SubSquare+1)+SubSquare,1);
+    lay->setColumnMinimumWidth(i*(SubSquare+1)+SubSquare,1);
+  }
 }
 
 /*  ****************** @class MWind::Cell ****************** */
@@ -44,10 +48,16 @@ void MWind::Cell::keyPressEvent(QKeyEvent *ev)
   switch (key) {
   case Qt::Key_Left: if (x>0) byCoord(x-1,y).setFocus(); break;
   case Qt::Key_Up:   if (y>0) byCoord(x,y-1).setFocus(); break;
-  case Qt::Key_Right:if (x<2) byCoord(x+1,y).setFocus(); break;
-  case Qt::Key_Down: if (y<2) byCoord(x,y+1).setFocus(); break;
+  case Qt::Key_Right:if (x<SideSize-1) byCoord(x+1,y).setFocus(); break;
+  case Qt::Key_Down: if (y<SideSize-1) byCoord(x,y+1).setFocus(); break;
   default: {
-    if (key>=Qt::Key_1 && key<=Qt::Key_9) swtVal(1<<(key-Qt::Key_1));
+    if (key>=Qt::Key_1 && key<=Qt::Key_9) {
+      if (ev->modifiers()&Qt::ControlModifier) {
+        val=1<<(key-Qt::Key_1);
+        updateVal();
+      }
+      else swtVal(1<<(key-Qt::Key_1));
+    }
   }
   }
 }
@@ -66,8 +76,8 @@ void MWind::Cell::updateVal()
   } else {
     QString ntext="<body><table width=100% hegth=100%>";
     int mask=1;
-    for(int i=0; i<9; ++i, mask<<=1) {
-      int x=i%3;
+    for(int i=0; i<SideSize; ++i, mask<<=1) {
+      int x=i%SubSquare;
       if (x==0) ntext.append("<tr>");
       ntext.append("<td align=center>"+((mask&val)?QString::number(i+1):QString(" ")));
     }
