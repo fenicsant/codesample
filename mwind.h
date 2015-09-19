@@ -44,7 +44,7 @@ public:
   {return *cells[y*SideSize+x];} //!< возвращает ячейку по ее координатам
   int value() const {return val;}//!< возвращает хранилище значений
   void setAllValues() {val = (1<<SideSize)-1; updateVal();} //!< сбрасывает значения на все допустимые
-  void swtVal(int v) {val ^= v; updateVal();}     //!< переключает значение
+  void swtVal(int v) { val ^= v; updateVal(true);}//!< переключает значение
   void setVal(int v) {val = v; updateVal(true);}  //!< устанавливает значение
   // выделение
   bool isSelected()const {return inselect;}       //!< возвращает флаг выбранности

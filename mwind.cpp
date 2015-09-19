@@ -122,7 +122,7 @@ void MWind::Cell::updateVal(bool updateRelated)
       QString color = "black";
       if (ICellValidator::cellValdator()) {
         switch (ICellValidator::cellValdator()->check(*this,i+1)) {
-        case ICellValidator::ValueBad: color = "#FF0F0F"; break;
+        case ICellValidator::ValueBad: color = "silver size=-2"; break;
         case ICellValidator::ValueRecomend: color = "green"; break;
         default:;
         }
