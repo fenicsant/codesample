@@ -3,16 +3,21 @@
 
 #include "mwind.h"
 
+//! интерфейс проверки корректности значения для ячейки
 
 class ICellValidator
 {
 public:
+  //! варианты корректности значения
   enum ValueValidity {
-    ValueValid,
-    ValueBad,
-    ValueRecomend
+    ValueValid,   //!< допустимое значение
+    ValueBad,     //!< ошибочное значение
+    ValueRecomend //!< рекомендованое значение
   };
-  virtual ValueValidity check(MWind::Cell & cell,int value);
+  //! функция проверяет значение на корректность
+  virtual ValueValidity check(MWind::Cell & cell,int digit) {return ValueValid;}
+  //! указатель на текущий валидатор
+  static ICellValidator * &cellValdator();
 };
 
 #endif // CELLVALIDATOR_H
