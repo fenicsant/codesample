@@ -5,10 +5,12 @@
 #include <QVector>
 #include <QLabel>
 
-#include<QDebug>
+//#include<QDebug>
 
 
 //! главное окно программы
+/*! Окно отображает матрицу ячеек. Основное назначение являться контейнером для
+    расположения ячеек и их начального создания. */
 class MWind : public QWidget
 {
   Q_OBJECT
@@ -21,15 +23,30 @@ public:
                     //! функция отображения окна. что более?
   static void showInst() {(new MWind)->show();}
   class Cell;       //!< ячейка матрицы для отображения на экране
+  enum RelationGroup {
+    RGHoriz = 1,    //!< ячейки горизонтальной группы
+    RGVert  = 2,    //!< ячейки вертикальной группы
+    RGSubSq = 4,    //!< ячейки малого квадрата
+    RGAll   = 7     //!< все группы вместе
+  };
+                    //! класс флагов групп
+  Q_DECLARE_FLAGS(RelationGroups,RelationGroup)
+                    //! отображает окно выбора.
+                    /*! @return 0 - нет выбора; -1 - сброс значения; или сам выбор. */
+  static int popupEnterForm(const QString& title);
 protected:
   //! на тот случай если окно будет не главным или их будет несколько
   void closeEvent(QCloseEvent *e) {QWidget::closeEvent(e);deleteLater();}
 private:
   explicit MWind(QWidget *parent = 0);
-  QVector<Cell*> cells;               //!< общий набор ячеек
+  QVector<Cell*> cells;               //!< общий набор ячеек @todo возможно лишнее, убрать
 };
 
 // ячейка матрицы для отображения на экране
+/*!
+  Основной функционал поведения закладывается в этом классе. Он производит
+  отображение ячейки, принимает управление.
+ */
 class MWind::Cell : public QLabel
 {
   Q_OBJECT
@@ -50,16 +67,21 @@ public:
   bool isSelected()const {return inselect;}       //!< возвращает флаг выбранности
   void setSelected(bool selected=true);           //!< устанавливает флаг выбранности
   // для валидатора..
-  QList<Cell*> relatedCells()const; //!< возвращает связанные ячейки
+                                                  //! возвращает связанные ячейки
+  QList<Cell*> relatedCells(RelationGroups group=RGAll)const;
   int isDeterminans()const;         //!< если значение определено (единственный вариант) возвращает его, иначе 0
 protected:
   void focusInEvent(QFocusEvent *ev) {setSelected(true); QLabel::focusInEvent(ev);}
   void focusOutEvent(QFocusEvent *ev) {setSelected(false); QLabel::focusOutEvent(ev);}
   void keyPressEvent(QKeyEvent *ev);
+  void mousePressEvent(QMouseEvent *ev);
+  void mouseDoubleClickEvent(QMouseEvent *ev);
 private:
   int val;
   bool inselect;
   void updateVal(bool updateRelated=false); //!< обновляет отображение
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(MWind::RelationGroups)
 
 #endif // MWIND_H
