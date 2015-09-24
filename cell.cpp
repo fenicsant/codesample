@@ -16,36 +16,6 @@ QDebug operator <<(QDebug d,const CellData &cd)
   return (d.nospace()<<"<m:"<<cd.max<<" ov:"<<cd.onlyval<<" val:"<<value.join(" ").toAscii().constData()<<">").space();
 }
 
-#include <QApplication>
-#include <QTableView>
-#include "celldecoration.h"
-int main(int ac,char **av)
-{
-  /*CellData a(64);
-  a.resetToAll();
-  a.setValue(33);
-  qDebug()<<a;
-  a.switchValue(37);
-  qDebug()<<a;
-  a.switchValue(33);
-  qDebug()<<a;
-  return 0;*/
-  QApplication app(ac,av);
-  CellMatrix *m = CellMatrix::createBySubSquareSize(3);
-  QTableView tw;
-  tw.horizontalHeader()->hide();
-  tw.verticalHeader()->hide();
-  tw.setItemDelegate(new CellDecoration());
-  tw.setModel(m);
-  for(int i=m->sideSize()-1; i>=0; --i) {
-    tw.setColumnWidth(i,m->cellWidth);
-    tw.setRowHeight(i,m->cellHeight);
-  }
-  m->cell(1,1).setValue(3);
-  tw.show();
-  return app.exec();
-}
-
 /* ****************  CellMatrix  **************** */
 
 QModelIndex CellMatrix::index(int row, int column, const QModelIndex &parent) const

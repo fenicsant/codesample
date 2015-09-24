@@ -38,7 +38,7 @@ public:
   // методы необходимы для работы модели
             //! возвращает данные по их координатам и роли
   QVariant data(const QModelIndex &index, int role) const {return QVariant();}
-  //Qt::ItemFlags flags(const QModelIndex &index) const;
+  Qt::ItemFlags flags(const QModelIndex &index) const {return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled; }
   // QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
             //! генерирует индекс модели по координатам и родительскому узлу
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
