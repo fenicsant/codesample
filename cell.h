@@ -10,6 +10,25 @@
 #include <QDebug>
 
 class CellData;
+
+//! подсказки решения судоку
+/*! класс делит варианты значений на три вида: неопределенный, некорректный и предпочтительный */
+class CellValidator
+{
+public:
+  enum Validation {
+    Vague,      //!< неопределенное значение
+    Brocked,    //!< некорректное значение
+    Recomend    //!< предпочтительное значение
+  };
+        //! возвращает список связанных ячеек
+  virtual QList<CellData *> getRelatedCells(CellData &cell);
+        //! возвращает true если требуется перерисовка связанных значений
+  virtual bool valueChanged(CellData &cell, CellData &prevValue);
+        //! возвращает характер значения ячейки
+  virtual Validation checkValue(CellData &cell, int value);
+};
+
 //! модель данных судоку
 /*! Модель имеет два представления, содержащая малые квадраты, и не содержащая
   малые квадраты. В первом случае размер стороны задается как квадрат размера
@@ -35,9 +54,15 @@ public:
             //! возвращает ячейку матрицы по ее координатам
   const CellData &cell(int x,int y) const
       {Q_ASSERT(hasPosiotion(x,y));return *pCells[y*pSideSize+x];}
+
+  CellValidator * cellValidator()const {return cellValid;}
+  void setCellValidator(CellValidator * validator);
+  QModelIndex getIndexForCell(const CellData &c) const;
+
   // методы необходимы для работы модели
             //! возвращает данные по их координатам и роли
   QVariant data(const QModelIndex &index, int role) const {return QVariant();}
+  bool setData(const QModelIndex &index, const QVariant &value, int role);
   Qt::ItemFlags flags(const QModelIndex &index) const {return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled; }
   // QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
             //! генерирует индекс модели по координатам и родительскому узлу
@@ -59,6 +84,7 @@ private:
   const int pSideSize;
   const int pMatrixSize;
   QVector<CellData*> pCells;
+  CellValidator *cellValid;
   bool hasPosiotion(int x, int y)const{return x>=0 && x<pSideSize && y>=0 && y<pSideSize;}
   static int getCellSize(int maxval, int squareSize, Qt::Orientation o);
 };
@@ -82,6 +108,7 @@ public:
   QList<int>values()const;  //!< возвращает список активных вариантов (медленный метод)
                             //! производит копирование узла
   explicit CellData(const CellData &);
+  CellData &operator = (const CellData & cell);
   ~CellData();              //!< деструктор
 
   CellMatrix *matrix() {return pmatrix;}
@@ -96,7 +123,6 @@ private:
   unsigned int *val;  //!< все варианты
   int testToOnly()const;  //!< проверка на единственность значения
   friend QDebug operator <<(QDebug,const CellData&);
-  CellData &operator = (const CellData &){Q_ASSERT(false); return *this;}
 };
 
 #endif // CELL_H

@@ -4,5 +4,5 @@
 # Небольшой вариан разработки кода
 #
 QT = core gui
-SOURCES += mainproc.cpp mwind.cpp cellvalidator.cpp celldecoration.cpp cell.cpp
-HEADERS += mwind.h cellvalidator.h celldecoration.h cell.h
+SOURCES += mainproc.cpp  mcelldata.cpp msudoku.cpp msudokudecaration.cpp
+HEADERS += mcelldata.h msudoku.h msudokudecaration.h
