@@ -5,8 +5,8 @@ MCellData::MCellData(int size) :
 {
   if (valSize == 0) return;
   if (valSize!=val.size()) val.resize(valSize);
-  resetToAll();
-  //for(int i=0; i<valSize; ++i) val[i]=0;
+  clearToNone();
+  //resetToAll();
 }
 
 void MCellData::resetToAll()
@@ -14,6 +14,11 @@ void MCellData::resetToAll()
   for(int i=valSize-2; i>=0; --i) val[i]=~(unsigned int)0;
   if (max%IntSize == 0) val[+valSize-1]=~(unsigned int)0;
   else val[valSize-1]=((unsigned int)1<<(max%IntSize))-1;
+}
+
+void MCellData::clearToNone()
+{
+  for(int i=valSize-2; i>=0; --i) val[i]=0;
 }
 
 void MCellData::setValue(int value)
@@ -35,7 +40,8 @@ void MCellData::switchValue(int value)
 
 bool MCellData::testValue(int value) const
 {
-  Q_ASSERT(value>0 && value<=max);
+  if (max == 0) return false;
+  //Q_ASSERT(value>0 && value<=max);
   --value;
   return (val[value/IntSize] & ((unsigned int)1<<(value%IntSize))) != 0;
 }

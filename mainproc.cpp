@@ -7,7 +7,7 @@
 
 #include <QTableView>
 #include "msudoku.h"
-//#include "msudokudecaration.h"
+#include "mcelldecor.h"
 
 //! точка входа в программу
 int main(int ac,char **av)
@@ -17,8 +17,10 @@ int main(int ac,char **av)
   MSudoku *model = MSudoku::createBySubSquareSize(3);
   QTableView tv;
   tv.setModel(model);
-  //tv.setItemDelegate(new MSudokuDecoration());
-  int size = (model->cellHeight>model->cellWidth)?model->cellHeight:model->cellWidth;
+  MCellDecor * decor = new MCellDecor(*model);
+  tv.setItemDelegate(decor);
+  //int size = (model->cellHeight>model->cellWidth)?model->cellHeight:model->cellWidth;
+  int size = decor->sizeBySide(model->sideSize());
   for(int i=model->sideSize()-1; i>=0; --i) {
     tv.setRowHeight(i,size);
     tv.setColumnWidth(i,size);

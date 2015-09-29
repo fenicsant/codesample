@@ -12,6 +12,7 @@ class MCellData
 public:
   MCellData(int size=0);
   void resetToAll();        //!< сбрасывает до всех возможных вариантов
+  void clearToNone();       //!< устанавливает отсутсвие вариантов
   void setValue(int value); //!< устанавливает фиксированное значение
                             //!  переключает указанных вариант
   void switchValue(int value);
@@ -31,9 +32,9 @@ public:
   MCellData &operator =(const QVariant &d)
      { return (*this = (d.canConvert<MCellData>())?d.value<MCellData>():MCellData());}
   operator QVariant()const {return QVariant::fromValue<MCellData>(*this);}
-private:
   enum {IntSize=sizeof(int)*8};
   const int max;      //!< количество вариантов
+private:
   const int valSize;  //!< размер массива (max/IntSize+1)
   int onlyval;        //!< единственное значение
   QVector<unsigned int> val;  //!< все варианты

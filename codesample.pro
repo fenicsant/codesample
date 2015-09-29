@@ -5,6 +5,6 @@
 #
 QT = core gui
 #SOURCES += mainproc.cpp  mcelldata.cpp msudoku.cpp msudokudecaration.cpp
-SOURCES += mainproc.cpp  mcelldata.cpp msudoku.cpp
-HEADERS += mcelldata.h msudoku.h
+SOURCES += mainproc.cpp  mcelldata.cpp msudoku.cpp mcelldecor.cpp
+HEADERS += mcelldata.h msudoku.h mcelldecor.h
 #msudokudecaration.h
