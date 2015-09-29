@@ -1,16 +1,17 @@
-#include "celldecoration.h"
-#include "cell.h"
+#include "msudokudecaration.h"
+
+#include "msudoku.h"
 #include <QPainter>
 #include <QLabel>
 #include <QGridLayout>
 #include <QKeyEvent>
 
-class CellDecoration::Editor : public QWidget
+class MSudokuDecoration::Editor : public QWidget
 {
 public:
-  const CellDecoration * own;
-  CellData *cell;
-  Editor(const CellDecoration * own_, QWidget *parent, int max, int side, CellData *cell_);
+  const MSudokuDecoration * own;
+  MSudokuCell *cell;
+  Editor(const MSudokuDecoration * own_, QWidget *parent, int max, int side, MSudokuCell *cell_);
   QVector<Label *> btns;
   void btnPressed(int num);
   void btnDblPressed(int num) {
@@ -35,7 +36,7 @@ protected:
   }
 };
 
-class CellDecoration::Label : public QLabel
+class MSudokuDecoration::Label : public QLabel
 {
 public:
   Editor *editor;
@@ -48,7 +49,7 @@ protected:
   void mouseDoubleClickEvent(QMouseEvent *ev) {editor->btnDblPressed(value); QLabel::mouseDoubleClickEvent(ev);}
 };
 
-CellDecoration::Editor::Editor(const CellDecoration *own_, QWidget *parent, int max, int side, CellData *cell_) :
+MSudokuDecoration::Editor::Editor(const MSudokuDecoration *own_, QWidget *parent, int max, int side, MSudokuCell *cell_) :
   QWidget(0,Qt::Popup),own(own_),cell(cell_)
 {
   setStyleSheet("background: black");
@@ -63,17 +64,16 @@ CellDecoration::Editor::Editor(const CellDecoration *own_, QWidget *parent, int 
   setLayout(lay);
 }
 
-void CellDecoration::Editor::btnPressed(int num)
+void MSudokuDecoration::Editor::btnPressed(int num)
 {
   cell->switchValue(num);
   btns[num-1]->setActive(cell->testValue(num));
-  qDebug()<<*cell;
 }
 
 
-void CellDecoration::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void MSudokuDecoration::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  CellData * cell = static_cast<CellData*>(index.internalPointer());
+  MSudokuCell * cell = static_cast<MSudokuCell*>(index.internalPointer());
   if (!cell) {QStyledItemDelegate::paint(painter,option,index); return;}
 
 
@@ -81,8 +81,8 @@ void CellDecoration::paint(QPainter *painter, const QStyleOptionViewItem &option
                    ?option.palette.highlightedText().color()
                    :option.palette.text().color()
                     );
-  if (cell->matrix()->subSquareSize()>0) {
-    int sss = cell->matrix()->subSquareSize();
+  if (cell->model()->subSquareSize()>0) {
+    int sss = cell->model()->subSquareSize();
     if (((cell->x/sss%2)^(cell->y/sss%2))!=0
         || option.state & QStyle::State_Selected)
       painter->fillRect(option.rect,
@@ -109,12 +109,12 @@ void CellDecoration::paint(QPainter *painter, const QStyleOptionViewItem &option
     return;
   } else painter->setFont(roughFont());
 
-  int sideDigCount = (cell->matrix()->subSquareSize()==0)?sqrt(cell->matrix()->sideSize()):cell->matrix()->subSquareSize();
+  int sideDigCount = (cell->model()->subSquareSize()==0)?sqrt(cell->model()->sideSize()):cell->model()->subSquareSize();
   int left = option.rect.left()+2;
   int top = option.rect.top()+2;
   int hstep = (option.rect.width()-4)/sideDigCount;
   int vstep = (option.rect.height()-4)/sideDigCount;
-  int max = cell->matrix()->sideSize();
+  int max = cell->model()->sideSize();
   for(int i=0; i<max; ++i)
     if (cell->testValue(i+1)) {
       int x = i%sideDigCount;
@@ -123,33 +123,33 @@ void CellDecoration::paint(QPainter *painter, const QStyleOptionViewItem &option
     }
 }
 
-QWidget *CellDecoration::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *MSudokuDecoration::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-  CellData * cell = static_cast<CellData*>(index.internalPointer());
+  MSudokuCell * cell = static_cast<MSudokuCell*>(index.internalPointer());
   if (!cell) {return QStyledItemDelegate::createEditor(parent,option,index); }
 
-  Editor *res = new Editor(this,parent,cell->matrix()->sideSize(),(cell->matrix()->subSquareSize()==0)?sqrt(cell->matrix()->sideSize()):cell->matrix()->subSquareSize(),cell);
+  Editor *res = new Editor(this,parent,cell->model()->sideSize(),(cell->model()->subSquareSize()==0)?sqrt(cell->model()->sideSize()):cell->model()->subSquareSize(),cell);
   res->setGeometry(QRect(parent->mapToGlobal(option.rect.topLeft()),option.rect.size()));
   return res;
 }
 
-void CellDecoration::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void MSudokuDecoration::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 }
 
-QFont &CellDecoration::roughFont()
+QFont &MSudokuDecoration::roughFont()
 {
   static QFont * res = new QFont("Arial",6);
   return *res;
 }
 
-QFont &CellDecoration::fairFont()
+QFont &MSudokuDecoration::fairFont()
 {
   static QFont * res = new QFont("Arial",12,QFont::Bold);
   return *res;
 }
 
-int CellDecoration::sqrt(int v)
+int MSudokuDecoration::sqrt(int v)
 {
   if (v<0) return 0;
   static QMap<int,int> cache;
@@ -159,8 +159,3 @@ int CellDecoration::sqrt(int v)
   cache[v]=i;
   return i;
 }
-
-
-
-
-// Если в сети нет пингЫ, виноваты админЫ

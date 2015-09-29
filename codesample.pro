@@ -4,5 +4,7 @@
 # Небольшой вариан разработки кода
 #
 QT = core gui
-SOURCES += mainproc.cpp  mcelldata.cpp msudoku.cpp msudokudecaration.cpp
-HEADERS += mcelldata.h msudoku.h msudokudecaration.h
+#SOURCES += mainproc.cpp  mcelldata.cpp msudoku.cpp msudokudecaration.cpp
+SOURCES += mainproc.cpp  mcelldata.cpp msudoku.cpp
+HEADERS += mcelldata.h msudoku.h
+#msudokudecaration.h
